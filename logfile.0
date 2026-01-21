@@ -1,0 +1,11 @@
+===============================================================================
+G E O S - C H E M   U S E R   I N P U T
+
+READ_INPUT_FILE: Reading input.geos
+===============================================================================
+GEOS-CHEM I/O ERROR    29 in file unit    10
+Encountered at routine:location read_input_file:1
+
+Error   29: File not found
+===============================================================================
+     - CLEANUP: deallocating arrays now...

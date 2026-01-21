@@ -1,0 +1,20 @@
+
+# 编译文件
+*.mod
+*.a
+*.so
+*.exe
+
+# 日志与输出
+*.log
+*.out
+*.nc
+*.bpch
+*.hdf
+*.h5
+*.bpch
+
+# 临时文件
+*~
+*.swp
+*.tmp
