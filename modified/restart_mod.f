@@ -212,6 +212,15 @@
          DO J = 1, JJPAR
          DO I = 1, IIPAR
             TRACER(I,J,L) = STT(I,J,L,N) * TCVV(N) / AD(I,J,L)
+            ! IF (I==118.AND.J==63.AND.L==1.AND.N==1) THEN
+            !       WRITE( 6, * ) '### dwh-DEBUG MAKE_RESTART_FILE ###'
+            !       WRITE( 6, * ) 'Coords (I,J,L,N): ', I, J, L, N
+            !       WRITE( 6, * ) 'STT (kg)        : ', STT(I,J,L,N)
+            !       WRITE( 6, * ) 'TCVV (MW ratio) : ', TCVV(N)
+            !       WRITE( 6, * ) 'AD (kg air)     : ', AD(I,J,L)
+            !       WRITE( 6, * ) 'Calculated (v/v): ', TRACER(I,J,L)
+            !       WRITE( 6, * ) '###############################'
+            !    ENDIF
          ENDDO
          ENDDO
          ENDDO
@@ -469,6 +478,11 @@
 
       ! Convert UNIT to uppercase
       CALL TRANUC( UNIT )
+      ! IF ( NTRACER == 1 ) THEN
+      !       WRITE(6,*) 'dwh-DEBUG: CONVERT_TRACER_TO_VV'
+      !       WRITE(6,*) '  Input UNIT (uppercased): ', TRIM(UNIT)
+      !       WRITE(6,*) '  Raw TRACER(118,63,1)   : ', TRACER(118,63,1)
+      !    ENDIF
 
       ! Convert from the current unit to v/v
       SELECT CASE ( TRIM( UNIT ) )

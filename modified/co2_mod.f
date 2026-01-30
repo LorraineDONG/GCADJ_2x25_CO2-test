@@ -370,21 +370,21 @@
       IF ( ITS_A_NEW_MONTH() ) THEN
 
          ! Fossil fuel emissions
-         print *,'CO2TEST:LANNFF'
+         ! print *,'dwh-CO2TEST:LANNFF'
          LANNFF = .TRUE.
          IF ( LMONFF .OR. LANNFF .OR. LGENFF ) THEN
             CALL READ_FOSSILCO2
          ENDIF
 
          ! Oceanic exchange
-         print *,'CO2TEST:LOCN2009ANN'
+         ! print *,'dwh-CO2TEST:LOCN2009ANN'
          LOCN2009ANN = .TRUE.
          IF ( LOCN1997 .OR. LOCN2009ANN .OR. LOCN2009MON ) THEN
             CALL READ_OCEANCO2
          ENDIF
 
          ! Ship emissions from EDGAR
-         print *,'CO2TEST:LSHIPEDG'
+         ! print *,'dwh-CO2TEST:LSHIPEDG'
          LSHIPEDG = .TRUE.
          IF ( LSHIPEDG ) CALL READ_SHIPCO2_EDGAR
 
@@ -392,7 +392,7 @@
          IF ( LSHIPICO ) CALL READ_SHIPCO2_ICOADS
 
          ! Aircraft CO2 emissions
-         print *,'CO2TEST:LPLANE'
+         ! print *,'dwh-CO2TEST:LPLANE'
          LPLANE = .TRUE.
          IF ( LPLANE   ) CALL READ_AVIATION_CO2
 
@@ -557,7 +557,7 @@
          !-------------------------------------------
          IF ( LSEASBB .OR. LGFED2BB .OR. L8DAYBB .OR.
      &        LGFED3BB) THEN
-            !print *,'CO2TEST:LGFED2BB'
+            !print *,'dwh-CO2TEST:LGFED2BB'
             ! Biomass burning emissions [molec/cm2/s]
             E_CO2          = BIOMASS(I,J,IDBCO2)
             !E_CO2          = EMBIOBRNCO2(I,J)
@@ -3405,11 +3405,11 @@
       !=================================================================
 
       ! Biofuel emissions
-      print *,'CO2TEST:LBIOFUEL'
+      ! print *,'dwh-CO2TEST:LBIOFUEL'
       IF (LBIOFUEL) CALL READ_ANNUAL_BIOFUELCO2
 
       ! Net terrestrial exchange
-      print *,'CO2TEST:LBIOETCLIM'
+      ! print *,'dwh-CO2TEST:LBIOETCLIM'
       LBIONETCLIM = .TRUE.
       IF (LBIONETORIG .OR. LBIONETCLIM) CALL READ_ANNUAL_BIONET_CO2
 

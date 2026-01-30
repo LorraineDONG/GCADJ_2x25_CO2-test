@@ -479,6 +479,12 @@ tes_ch4_mod.o        : tes_ch4_mod.f
 	$(F90) -c -r8 $<
 
 #====================
+# GOSAT CO2
+#====================
+gosat_co2_mod.o        : gosat_co2_mod.f
+	$(F90) -c -r8 $<
+
+#====================
 # TROPOMI NO2
 #====================
 tropomi_no2_obs_mod.o: tropomi_no2_obs_mod.f90

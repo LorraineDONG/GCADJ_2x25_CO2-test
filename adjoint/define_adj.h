@@ -150,11 +150,11 @@
 
 !-------TROPOMI NO2 tropospheric columns--
 ! => TROPOMI_NO2_OBS
-#define TROPOMI_NO2_OBS 'TROPOMI_NO2_OBS'
+!#define TROPOMI_NO2_OBS 'TROPOMI_NO2_OBS'
 
 !-------CO2 observations------------
 ! => GOSAT_CO2_OBS
-!#define GOSAT_CO2_OBS
+#define GOSAT_CO2_OBS
 
 !-------SO2 observations------------
 ! => OMI_SO2_OBS
@@ -162,7 +162,7 @@
 
 !------other options-----------------
 !#define PSEUDO_OBS    'PSEUDO_OBS'
-#define LOG_OPT       'LOG_OPT'
+!#define LOG_OPT       'LOG_OPT'
 !#define LIDORT        'LIDORT'
 !#define LBFGS_INV     'LBFGS_INV'
 !#define LBKCOV_ERR    'LBKCOV_ERR'
