@@ -21,6 +21,7 @@
                   INTEGER     :: QF        
                   REAL*8      :: CO2
                   REAL*8      :: PRES(MAXLEV)
+                  REAL*8      :: PRES_WF(MAXLEV)
                   REAL*8      :: PRIOR
                   REAL*8      :: AVG_KERNEL(MAXLEV)
                   REAL*8      :: PRIOR_PROF(MAXLEV)
@@ -78,8 +79,8 @@
             REAL(DP), PARAMETER :: FILL_VAL = -999.0_DP
       
             ! --- NetCDF ID Variables ---
-            INTEGER :: FID, NT_ID, AP_ID, QF_ID, ERR_ID, PF_ID
-            INTEGER :: CO2_ID, PS_ID, LA_ID, LO_ID, TM_ID, AK_ID
+            INTEGER :: FID, NT_ID, AP_ID, QF_ID, ERR_ID, PF_ID, TM_ID
+            INTEGER :: CO2_ID, PS_ID, LA_ID, LO_ID, AK_ID, PWF_ID
       
             ! --- Temporary Arrays ---
             REAL(DP), ALLOCATABLE :: TMP_LAT(:)
@@ -87,6 +88,7 @@
             REAL(DP), ALLOCATABLE :: TMP_TIME(:)
             REAL(DP), ALLOCATABLE :: TMP_CO2(:)
             REAL(DP), ALLOCATABLE :: TMP_PRES(:,:)
+            REAL(DP), ALLOCATABLE :: TMP_PWF(:,:)
             REAL(DP), ALLOCATABLE :: TMP_PF(:,:)
             REAL(DP), ALLOCATABLE :: TMP_AK(:,:) 
             REAL(DP), ALLOCATABLE :: TMP_PRIOR(:)    
@@ -135,7 +137,9 @@
      &                                                  ERR_ID), 110)
            CALL CHECK( NF90_INQ_VARID( FID,"co2_profile_apriori",
      &                                                    PF_ID),111)
-     
+           CALL CHECK( NF90_INQ_VARID( FID,"pres_weight_func",
+     &                                                   PWF_ID),112)
+          
            ! READ number of retrievals, NGOS
            CALL CHECK(NF90_INQUIRE_DIMENSION(FID,NT_ID,LEN=NGOS),201)
      
@@ -150,6 +154,7 @@
            ALLOCATE( TMP_CO2(NGOS), TMP_PRIOR(NGOS), TMP_ERR(NGOS))
            ALLOCATE( TMP_QF(NGOS) )
            ALLOCATE( TMP_PRES(MAXLEV, NGOS) )
+           ALLOCATE( TMP_PWF(MAXLEV, NGOS) )
            ALLOCATE( TMP_PF(MAXLEV, NGOS) )
            ALLOCATE( TMP_AK(MAXLEV, NGOS) )
      
@@ -165,6 +170,7 @@
            CALL CHECK( NF90_GET_VAR( FID, AP_ID,  TMP_PRIOR), 308 )
            CALL CHECK( NF90_GET_VAR( FID, QF_ID,  TMP_QF   ), 309 )
            CALL CHECK( NF90_GET_VAR( FID, ERR_ID, TMP_ERR  ), 310 )
+           CALL CHECK( NF90_GET_VAR( FID, PWF_ID, TMP_PWF  ), 311 )
      
            CALL CHECK( NF90_CLOSE( FID ), 999 )
      
@@ -181,12 +187,13 @@
                  GOS(N)%CO2_ERR = TMP_ERR(N)
         
                  GOS(N)%PRES(:)       = TMP_PRES(:, N)
+                 GOS(N)%PRES_WF(:)    = TMP_PWF(:, N)
                  GOS(N)%AVG_KERNEL(:) = TMP_AK(:, N)
                  GOS(N)%PRIOR_PROF(:) = TMP_PF(:, N)
            END DO
      
            DEALLOCATE( TMP_LAT, TMP_LON, TMP_TIME, TMP_CO2 )
-           DEALLOCATE( TMP_PRIOR, TMP_ERR, TMP_QF )
+           DEALLOCATE( TMP_PRIOR, TMP_ERR, TMP_QF, TMP_PWF )
            DEALLOCATE( TMP_PRES, TMP_AK, TMP_PF)
      
            END SUBROUTINE READ_GOS_CO2_OBS
@@ -370,9 +377,9 @@
                ! Get CO2 values at native model resolution
                GC_CO2_NATIVE(:) = CHK_STT(I,J,:,IDTCO2)
       
-               ! Convert from kg/box to v/v
-               GC_CO2_NATIVE(:) = GC_CO2_NATIVE(:) * TCVV_CO2
-     &                    / AD(I,J,:)
+               ! Convert from kg/box to ppm
+               GC_CO2_NATIVE(:) = GC_CO2_NATIVE(:) * TCVV_CO2 
+     &                         * 1.0d6 / AD(I,J,:)
       
                ! Interpolate GC CO2 column to TES grid
                DO LL = 1, LGOS
@@ -389,29 +396,15 @@
                XCO2_HAT = GOS(NT)%PRIOR
                DO L = 1, LGOS
                   CO2_PERT(L) = GC_CO2(L) - GOS(NT)%PRIOR_PROF(L)
-                  XCO2_HAT = XCO2_HAT+GOS(NT)%AVG_KERNEL(L)*CO2_PERT(L)
-                  ! NOTE: Original code had GC_CO2(L) in eq above, likely typo or 
-                  ! assumed CO2_PERT. Checking original line:
-                  ! XCO2_HAT = XCO2_HAT+GOS(NT)%AVG_KERNEL(L)*GC_CO2(L)
-                  ! Usually AK is applied to (Model - Prior) + Prior. 
-                  ! I will keep original math to ensure consistency with user's file.
-                  ! Reverting to user provided logic:
+                  XCO2_HAT = XCO2_HAT+GOS(NT)%AVG_KERNEL(L) * 
+     &                       GOS(NT)%PRES_WF(L) * CO2_PERT(L)
                ENDDO
                
-               ! Re-applying user logic exactly as provided in input file:
-               XCO2_HAT = GOS(NT)%PRIOR
-               DO L = 1, LGOS
-                   ! Only for perturb calculation, unused in hat?
-                   CO2_PERT(L) = GC_CO2(L) - GOS(NT)%PRIOR_PROF(L) 
-                   ! User provided line 102:
-                   XCO2_HAT = XCO2_HAT+GOS(NT)%AVG_KERNEL(L)*GC_CO2(L)
-               ENDDO
-      
                !--------------------------------------------------------------
                ! Calculate cost function, given S is error in vmr
                ! J = 1/2 [ model - obs ]^T S_{obs}^{-1} [ model - obs ]
                !--------------------------------------------------------------
-      
+               
                DIFF_SCALAR = XCO2_HAT - GOS(NT)%CO2
                OBS_ERROR_SQ = GOS(NT)%CO2_ERR ** 2
       
@@ -446,7 +439,8 @@
                GC_CO2_ADJ(:) = 0d0
       
                DO L = 1, LGOS          
-                  GC_CO2_ADJ(L) = FORCE_SCALAR * GOS(NT)%AVG_KERNEL(L)     
+                  GC_CO2_ADJ(L) = FORCE_SCALAR * GOS(NT)%AVG_KERNEL(L) 
+     &                         * 1.0d6 * GOS(NT)%PRES_WF(L)            
                ENDDO
       
                GC_CO2_NATIVE_ADJ(:) = 0d0

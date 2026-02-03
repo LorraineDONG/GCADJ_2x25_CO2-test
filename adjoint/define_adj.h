@@ -162,7 +162,7 @@
 
 !------other options-----------------
 !#define PSEUDO_OBS    'PSEUDO_OBS'
-!#define LOG_OPT       'LOG_OPT'
+#define LOG_OPT       'LOG_OPT'
 !#define LIDORT        'LIDORT'
 !#define LBFGS_INV     'LBFGS_INV'
 !#define LBKCOV_ERR    'LBKCOV_ERR'
