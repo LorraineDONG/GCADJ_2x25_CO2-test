@@ -309,6 +309,7 @@ sciabr_co_obs_mod.o           \
 tes_ch4_mod.o                 \
 tropomi_no2_obs_mod.o         \
 gosat_co2_mod.o               \
+ml_co2en_ff_mod.o             \
 mem_ch4_mod.o                 \
 leo_ch4_mod.o                 \
 geocape_ch4_mod.o             \

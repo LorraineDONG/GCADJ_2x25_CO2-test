@@ -479,6 +479,12 @@ tes_ch4_mod.o        : tes_ch4_mod.f
 	$(F90) -c -r8 $<
 
 #====================
+# ML XCO2EN
+#====================
+ml_co2en_ff_mod.o        : ml_co2en_ff_mod.f
+	$(F90) -c -r8 $<
+
+#====================
 # GOSAT CO2
 #====================
 gosat_co2_mod.o        : gosat_co2_mod.f

@@ -397,6 +397,8 @@
          IF ( LPLANE   ) CALL READ_AVIATION_CO2
 
          ! Get chemical source   ! dbj
+         ! print *,'dwh-CO2TEST:LCHEMCO2'
+         ! LCHEMCO2 = .TRUE.
          IF ( LCHEMCO2 ) THEN
             CALL READ_CHEMCO2
             CALL CHEM_SURF
@@ -876,6 +878,9 @@
       if (YEAR < 2000) then
         YEAR = 2000
       endif
+      if (YEAR > 2009) then
+         YEAR = 2009
+       endif
       MONTH  = GET_MONTH()
       TAU = GET_TAU0( MONTH, 1, YEAR )
 
@@ -884,8 +889,8 @@
       FILENAME = TRIM( DATA_DIR )                     //
      &           'CO2_201003/ChemSrc/CO2_prod_rates_' //
      &           TRIM( YEAR_STR )        // '.'       //
-     &           TRIM( GET_MODELNAME() ) // '.'       //
-     &           GET_RES_EXT()
+     &           'geos5' // '.'       //
+     &           GET_RES_EXT() // '.47L'
 
       ARRAY = 0.0e0
 
@@ -1010,6 +1015,31 @@
 
          TAU      = GET_TAU0( 1, 1, YEAR )
          FILENAME = TRIM( DATA_DIR )                                //
+
+! !------------------------------------------------------------------------------
+! ! dwh-Modified: Read annual BPCH data for 2000-2022
+! !------------------------------------------------------------------------------
+!      &              'your_custom_path/annual_bpch/ff.'              //
+!      &              YEAR_STR        // '.'                          //
+!      &              GET_NAME_EXT_2D() // '.' // GET_RES_EXT()
+    
+!              WRITE( 6, 110 ) TRIM( FILENAME )
+    
+!           ELSE IF ( LMONFF ) THEN
+    
+!              TAU      = GET_TAU0( MONTH, 1, YEAR )
+!              FILENAME = TRIM( DATA_DIR )                            //
+! !------------------------------------------------------------------------------
+! ! dwh-Modified: Read monthly BPCH data for 2000-2022
+! !------------------------------------------------------------------------------
+!      &              'your_custom_path/monthly_bpch/ff.'            //
+!      &              YEAR_STR        // MONTH_STR // '.'            //
+!      &              GET_NAME_EXT_2D() // '.' // GET_RES_EXT()
+    
+!              WRITE( 6, 120 ) TRIM( FILENAME )
+    
+!           ENDIF    
+
 !------------------------------------------------------------------------------
 ! Prior to 2/25/11:
 ! Now use updated CO2 annual emissions from CDIAC (cf Bob Andres)
@@ -1039,6 +1069,7 @@
          WRITE( 6, 120 ) TRIM( FILENAME )
 
       ENDIF
+
 
       ! FORMATS
  100  FORMAT( '     - READ_GENERIC_FOSSCO2: Reading ', a )
@@ -1225,8 +1256,7 @@
       TAU      = GET_TAU0( MONTH, 1, 2004 )
 
       FILENAME = TRIM( DATA_DIR )                 //
-     &           'CO2_201003/ChemSrc/CH4_source.' //
-     &           GET_NAME_EXT_2D() // '.'         //
+     &           'CO2_201003/ChemSrc/CH4_source.geos.' //
      &           GET_RES_EXT()
 
       ! %%% Livestock %%%
@@ -1310,8 +1340,8 @@
       TAU = GET_TAU0( MONTH, 1, 2004 )
 
       FILENAME = TRIM( DATA_DIR )                            //
-     &           'CO2_201003/ChemSrc/Isoprene-2004.'         //
-     &           GET_NAME_EXT_2D()  // '.' // GET_RES_EXT()
+     &           'CO2_201003/ChemSrc/Isoprene-2004.geos.'         //
+     &           GET_RES_EXT()
 
       WRITE( 6, 150 ) TRIM( FILENAME )
  150  FORMAT( '     - READ_ISOPRENE: Reading ', a )
@@ -1326,8 +1356,8 @@
       !-----------------------------------------------------------------
 
       FILENAME = TRIM( DATA_DIR )                            //
-     &           'CO2_201003/ChemSrc/Monoterpene-2004.'      //
-     &           GET_NAME_EXT_2D() // '.' // GET_RES_EXT()
+     &           'CO2_201003/ChemSrc/Monoterpene-2004.geos.'      //
+     &           GET_RES_EXT()
 
       WRITE( 6, 160 ) TRIM( FILENAME )
  160  FORMAT( '     - READ_MONOTERPENE: Reading ', a )

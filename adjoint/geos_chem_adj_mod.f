@@ -1810,6 +1810,10 @@
       USE GOSAT_CO2_MOD,       ONLY : CALC_GOS_CO2_FORCE
 #endif
 
+#if defined(ML_CO2EN_OBS)
+      USE XCO2EN_OBS_MOD,       ONLY : CALC_XCO2EN_FORCE
+#endif
+
 ! Add MOPITT v5 (zhej, dkh, 01/16/12, adj32_016)
 #if   defined( MOPITT_v5_CO_OBS ) || defined ( MOPITT_V6_CO_OBS )
       USE MOPITT_OBS_MOD,       ONLY : READ_MOPITT_FILE,
@@ -2141,6 +2145,18 @@
       CF_PRIOR = COST_FUNC
 
       CALL CALC_GOS_CO2_FORCE( COST_FUNC )
+
+      ! Track cost function contributions
+      CF_GOSCO2 = CF_GOSCO2 + COST_FUNC - CF_PRIOR
+
+#endif
+
+#if   defined ( ML_CO2EN_OBS )
+
+      ! Track cost function contributions
+      CF_PRIOR = COST_FUNC
+
+      CALL CALC_XCO2EN_FORCE( COST_FUNC )
 
       ! Track cost function contributions
       CF_GOSCO2 = CF_GOSCO2 + COST_FUNC - CF_PRIOR

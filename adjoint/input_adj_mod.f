@@ -2775,7 +2775,7 @@
       ! add MOPITT_V5_CO_OBS (adj32_016)
       ! add CH4 (kjw, dkh, 02/12/12, adj32_023)
       IF ( L3DVAR .or. L4DVAR  ) THEN
-#if !defined(MOPITT_V5_CO_OBS) && !defined(MOPITT_V6_CO_OBS) && !defined(AIRS_CO_OBS) && !defined(SCIA_BRE_CO_OBS) && !defined(TES_NH3_OBS)&& !defined(SCIA_DAL_SO2_OBS) && !defined(PM_ATTAINMENT) && !defined(IMPROVE_SO4_NIT_OBS) && !defined(CASTNET_NH4_OBS) && !defined(SOMO35_ATTAINMENT) && !defined(TES_O3_OBS)&& !defined(SCIA_KNMI_NO2_OBS) && !defined(SCIA_DAL_NO2_OBS) && !defined(PSEUDO_OBS) && !defined(GOSAT_CO2_OBS) & !defined(MODIS_AOD_OBS) && !defined(IMPROVE_BC_OC_OBS) && !defined(TES_CH4_OBS) && !defined(SCIA_CH4_OBS) && !defined(MEM_CH4_OBS) && !defined(LEO_CH4_OBS) && !defined(GEOCAPE_CH4_OBS)  && !defined( TES_O3_IRK ) && !defined( OMI_SO2_OBS ) && !defined( OMI_NO2_OBS ) && !defined(TROPOMI_NO2_OBS)
+#if !defined(MOPITT_V5_CO_OBS) && !defined(MOPITT_V6_CO_OBS) && !defined(AIRS_CO_OBS) && !defined(SCIA_BRE_CO_OBS) && !defined(TES_NH3_OBS)&& !defined(SCIA_DAL_SO2_OBS) && !defined(PM_ATTAINMENT) && !defined(IMPROVE_SO4_NIT_OBS) && !defined(CASTNET_NH4_OBS) && !defined(SOMO35_ATTAINMENT) && !defined(TES_O3_OBS)&& !defined(SCIA_KNMI_NO2_OBS) && !defined(SCIA_DAL_NO2_OBS) && !defined(PSEUDO_OBS) && !defined(ML_CO2EN_OBS) && !defined(GOSAT_CO2_OBS) & !defined(MODIS_AOD_OBS) && !defined(IMPROVE_BC_OC_OBS) && !defined(TES_CH4_OBS) && !defined(SCIA_CH4_OBS) && !defined(MEM_CH4_OBS) && !defined(LEO_CH4_OBS) && !defined(GEOCAPE_CH4_OBS)  && !defined( TES_O3_IRK ) && !defined( OMI_SO2_OBS ) && !defined( OMI_NO2_OBS ) && !defined(TROPOMI_NO2_OBS)
          MSG = 'Invalid adj run options: need to define obs for xDVAR'
          CALL ERROR_STOP( MSG, 'ARE_FLAGS_VALID ("input_adj_mod.f")' )
 #endif
@@ -2787,7 +2787,7 @@
       ! add OMI_SO2_OBS ()
       ! add MOPITT_V5_CO_OBS (adj32_016)
       ! add CH4 (kjw, dkh, 02/12/12, adj32_023)
-#if defined(MOPITT_V5_CO_OBS) || defined(MOPITT_V6_CO_OBS) || defined(AIRS_CO_OBS) || defined(SCIA_BRE_CO_OBS) || defined(TES_NH3_OBS) || defined(SCIA_DAL_SO2_OBS) || defined(PM_ATTAINMENT) || defined(IMPROVE_SO4_NIT_OBS) || defined(CASTNET_NH4_OBS) || defined(SOMO35_ATTAINMENT) || defined(TES_O3_OBS) || defined(SCIA_KNMI_NO2_OBS) || defined(SCIA_DAL_NO2_OBS) || defined(GOSAT_CO2_OBS) || defined(MODIS_AOD_OBS) || defined(IMPROVE_BC_OC_OBS) || defined(TES_CH4_OBS) || defined(SCIA_CH4_OBS) || defined(MEM_CH4_OBS) || defined(LEO_CH4_OBS) || defined(GEOCAPE_CH4_OBS)  || defined(TES_O3_IRK) || defined(OMI_SO2_OBS) || defined( OMI_NO2_OBS ) || defined(PSEUDO_OBS) || defined(TROPOMI_NO2_OBS)
+#if defined(MOPITT_V5_CO_OBS) || defined(MOPITT_V6_CO_OBS) || defined(AIRS_CO_OBS) || defined(SCIA_BRE_CO_OBS) || defined(TES_NH3_OBS) || defined(SCIA_DAL_SO2_OBS) || defined(PM_ATTAINMENT) || defined(IMPROVE_SO4_NIT_OBS) || defined(CASTNET_NH4_OBS) || defined(SOMO35_ATTAINMENT) || defined(TES_O3_OBS) || defined(SCIA_KNMI_NO2_OBS) || defined(SCIA_DAL_NO2_OBS) || defined(GOSAT_CO2_OBS) || defined(MODIS_AOD_OBS) || defined(IMPROVE_BC_OC_OBS) || defined(TES_CH4_OBS) || defined(SCIA_CH4_OBS) || defined(MEM_CH4_OBS) || defined(LEO_CH4_OBS) || defined(GEOCAPE_CH4_OBS)  || defined(TES_O3_IRK) || defined(OMI_SO2_OBS) || defined( OMI_NO2_OBS ) || defined(PSEUDO_OBS) || defined(TROPOMI_NO2_OBS) || defined(ML_CO2EN_OBS)
 
          IF ( .not. ( L3DVAR .or. L4DVAR ) ) THEN
             MSG = 'Invalid adj run options: need to define VAR for obs'
@@ -2808,7 +2808,7 @@
       ! add OMI_SO2_OBS ()
       ! add MOPITT_V5_CO_OBS (adj32_016)
       ! add CH4 (kjw, dkh, 02/12/12, adj32_023)
-#if  defined(MOPITT_V5_CO_OBS) || defined(MOPITT_V6_CO_OBS) || defined(AIRS_CO_OBS) || defined(SCIA_BRE_CO_OBS) || defined(TES_NH3_OBS) || defined(SCIA_DAL_SO2_OBS) || defined(PM_ATTAINMENT) || defined(IMPROVE_SO4_NIT_OBS) || defined(CASTNET_NH4_OBS) || defined(SOMO35_ATTAINMENT) || defined(TES_O3_OBS) || defined(SCIA_KNMI_NO2_OBS) || defined(SCIA_DAL_NO2_OBS) || defined(GOSAT_CO2_OBS) || defined(MODIS_AOD_OBS) || defined(IMPROVE_BC_OC_OBS) || defined(TES_CH4_OBS) || defined(SCIA_CH4_OBS) || defined(MEM_CH4_OBS) || defined(LEO_CH4_OBS) || defined(GEOCAPE_CH4_OBS) || defined(TES_O3_IRK) || defined(OMI_SO2_OBS) || defined( OMI_NO2_OBS ) || defined(TROPOMI_NO2_OBS)
+#if  defined(MOPITT_V5_CO_OBS) || defined(MOPITT_V6_CO_OBS) || defined(AIRS_CO_OBS) || defined(SCIA_BRE_CO_OBS) || defined(TES_NH3_OBS) || defined(SCIA_DAL_SO2_OBS) || defined(PM_ATTAINMENT) || defined(IMPROVE_SO4_NIT_OBS) || defined(CASTNET_NH4_OBS) || defined(SOMO35_ATTAINMENT) || defined(TES_O3_OBS) || defined(SCIA_KNMI_NO2_OBS) || defined(SCIA_DAL_NO2_OBS) || defined(GOSAT_CO2_OBS) || defined(MODIS_AOD_OBS) || defined(IMPROVE_BC_OC_OBS) || defined(TES_CH4_OBS) || defined(SCIA_CH4_OBS) || defined(MEM_CH4_OBS) || defined(LEO_CH4_OBS) || defined(GEOCAPE_CH4_OBS) || defined(TES_O3_IRK) || defined(OMI_SO2_OBS) || defined( OMI_NO2_OBS ) || defined(TROPOMI_NO2_OBS) || defined(ML_CO2EN_OBS)
 
 
 #if defined(PSEUDO_OBS)
