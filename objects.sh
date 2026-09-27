@@ -65,6 +65,7 @@ find="rpmares_mod.o"
 replace="rpmares_mod.o        \
 gosat_co2_mod.o               \
 ml_co2en_ff_mod.o             \
+oco_xco2_obs_mod.o            \
 tes_nh3_mod.o                 \
 tes_o3_mod.o                  \
 tes_o3_irk_mod.o"

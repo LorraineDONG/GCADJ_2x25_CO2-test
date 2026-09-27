@@ -447,6 +447,7 @@
       ! Local variables
       LOGICAL, SAVE                 :: FIRST = .TRUE.
       LOGICAL                       :: IS_CONC
+      REAL*8, ALLOCATABLE :: GLOBAL_FINE(:,:,:) ! DWH-test
 
       !=================================================================
       ! DO_REGRID_1x1 begins here!
@@ -592,13 +593,50 @@
      &                                INDATA, OUTDATA )
 
 #elif defined( GRID025x03125 ) && defined( NESTED_CH )
-      !print *, 'before nested regrid', L1x1
-      !print *, INDATA(I1x1,J1x1,1)
-      CALL DO_REGRID_025x03125( L1x1, UNIT, INDATA, OUTDATA )
-      !print *, 'after nested regrid'
+      ! print *, 'before nested regrid', L1x1
+      ! print *, 'shape(INDATA)',shape(INDATA)
+      ! print *, 'shape(OUTDATA)',shape(OUTDATA)
+      ! CALL DO_REGRID_025x03125( L1x1, UNIT, INDATA, OUTDATA )
+      ! print *, 'after nested regrid'
+
+! -------------------DWH-test ---------------------------
+      ALLOCATE( GLOBAL_FINE(1152, 721, L1x1) )
+      GLOBAL_FINE = 0.0d0
+
+      Print*,'DWH-shape(INDATA) before DO_REGRID_025x03125',
+     &                                    shape(INDATA)
+      Print*,'DWH-shape(OUTDATA) before DO_REGRID_025x03125',
+     &                                    shape(OUTDATA)
+
+      CALL REGRID_1x1_TO_025x03125( I1x1,  J1x1, L1x1, UNIT,
+     &                              INDATA, GLOBAL_FINE )
+      CALL DO_REGRID_025x03125( L1x1, UNIT, GLOBAL_FINE, OUTDATA )
+      DEALLOCATE( GLOBAL_FINE )
+
+      Print*,'DWH-shape(INDATA) after DO_REGRID_025x03125',
+     &                                    shape(INDATA)
+      Print*,'DWH-shape(OUTDATA) after DO_REGRID_025x03125',
+     &                                    shape(OUTDATA)   
+! -------------------DWH-test ---------------------------
+
 #elif defined( GRID025x03125 ) && defined( NESTED_NA )
 
       CALL DO_REGRID_025x03125( L1x1, UNIT, INDATA, OUTDATA )
+
+#elif defined( GRID025x03125 ) && defined( NESTED_SD )
+
+      ALLOCATE( GLOBAL_FINE(1152, 721, L1x1) )
+      GLOBAL_FINE = 0.0d0
+
+      Print*,'DWH-shape(INDATA) before DO_REGRID_025x03125',
+     &                                    shape(INDATA)
+      Print*,'DWH-shape(OUTDATA) before DO_REGRID_025x03125',
+     &                                    shape(OUTDATA)
+
+      CALL REGRID_1x1_TO_025x03125( I1x1,  J1x1, L1x1, UNIT,
+     &                              INDATA, GLOBAL_FINE )
+      CALL DO_REGRID_025x03125( L1x1, UNIT, GLOBAL_FINE, OUTDATA )
+      DEALLOCATE( GLOBAL_FINE )
 
 #else
 
@@ -813,17 +851,19 @@
 
       ! China nested grid has corners (70E,15S) and (140E,55N)
       ! which corresponds to 025x03125 indices (801,412) and (1025,581)
-      !print*, 'nested regrid 3D here'
-      !print*, IIPAR, JJPAR
-      !print*, I1x1, J1x1
-      !print*, I025x031, J025x031
-      !print*, INDATA(1,1,1)
-      !print*, INDATA(I1x1,J1x1,1)
-      !print*, INDATA(I1x1+1,J1x1+1,1)
-      !print*, INDATA(I1x1+1,J1x1,1)
-      !print*, INDATA(I1x1,J1x1+1,1)
+      write(*,*) '=== DO_REGRID_025x03125_3D, NESTED_CH branch ==='
+      write(*,*) 'IIPAR =', IIPAR
+      write(*,*) 'JJPAR =', JJPAR
+      write(*,*) 'shape(INDATA) =', shape(INDATA)
+      write(*,*) 'shape(OUTDATA)=', shape(OUTDATA)
+      write(*,*) 'lbound(INDATA)=', lbound(INDATA)
+      write(*,*) 'ubound(INDATA)=', ubound(INDATA)
+      write(*,*) 'lbound(OUTDATA)=', lbound(OUTDATA)
+      write(*,*) 'ubound(OUTDATA)=', ubound(OUTDATA)
+
       OUTDATA(1:IIPAR,1:JJPAR,1) = INDATA( 801:1025,421:581,1)
-      !print*, 'after 3D regrid'
+      write(*,*) 'Assignment done successfully'
+
 #elif defined( GRID025x03125 ) && defined( NESTED_NA ) && !defined( NESTED_SD )
 
       !-----------------------------------------------
@@ -2332,7 +2372,184 @@
       END SUBROUTINE REGRID_MASS_TO_1x125
 
 !------------------------------------------------------------------------------
+      SUBROUTINE REGRID_1x1_TO_025x03125( I1, J1, L1, UNIT,
+     &                                    IN1x1, GLOBAL_FINE )
+!
+!*********************************************************************
+!  Subroutine REGRID_1x1_TO_025x03125 regrids 1x1 data to 0.25x0.3125
+!  global data. It dynamically computes area-overlap weights to ensure
+!  perfect mass conservation and accurate concentration averaging.
+!  DWH, 9/June/2026    
+!*********************************************************************
+!
+      ! Arguments
+      INTEGER,          INTENT(IN)  :: I1, J1, L1
+      REAL*8,           INTENT(IN)  :: IN1x1(I1,J1,L1)
+      REAL*8,           INTENT(OUT) :: GLOBAL_FINE(1152,721,L1)
+      CHARACTER(LEN=*), INTENT(IN)  :: UNIT
 
+      ! Local variables
+      LOGICAL :: IS_CONC
+      INTEGER :: I, J, L, X, Y
+      INTEGER :: L_edge, R_edge, xc1, xc2
+      INTEGER :: B_edge, T_edge, yc1, yc2
+      REAL*8  :: WX1, WX2, WY1, WY2, VAL
+
+      ! Arrays to store the mapping edges
+      INTEGER :: CE(182), FE(722)
+
+      ! Arrays to store pre-computed weights and indices
+      INTEGER :: IX1(1152), IX2(1152)
+      REAL*8  :: FRAC_X1(1152), FRAC_X2(1152)
+      INTEGER :: IY1(721), IY2(721)
+      REAL*8  :: FRAC_Y1(721), FRAC_Y2(721)
+
+      !==================================================================
+      ! REGRID_1x1_TO_025x03125 begins here!
+      !==================================================================
+
+      ! Determine if we are averaging (concentration) or summing (mass)
+      IS_CONC = ITS_CONCENTRATION_DATA( UNIT )
+
+      !------------------------------------------------------------------
+      ! 1. Pre-compute Longitude weights (Units = 1/16 degree)
+      !    Coarse 1x1 width = 16 units. Fine 0.3125 width = 5 units.
+      !------------------------------------------------------------------
+      DO X = 1, 1152
+      L_edge = (X - 1) * 5
+      R_edge = X * 5
+
+      xc1 = (L_edge / 16) + 1
+      xc2 = ((R_edge - 1) / 16) + 1
+
+      IX1(X) = xc1
+      IX2(X) = xc2
+
+      IF ( xc1 == xc2 ) THEN
+            IF ( IS_CONC ) THEN
+            FRAC_X1(X) = 1.0d0
+            FRAC_X2(X) = 0.0d0
+            ELSE
+            FRAC_X1(X) = 5.0d0 / 16.0d0
+            FRAC_X2(X) = 0.0d0
+            ENDIF
+      ELSE
+            IF ( IS_CONC ) THEN
+            FRAC_X1(X) = DBLE( (xc1 * 16) - L_edge ) / 5.0d0
+            FRAC_X2(X) = DBLE( R_edge - (xc1 * 16) ) / 5.0d0
+            ELSE
+            FRAC_X1(X) = DBLE( (xc1 * 16) - L_edge ) / 16.0d0
+            FRAC_X2(X) = DBLE( R_edge - (xc1 * 16) ) / 16.0d0
+            ENDIF
+      ENDIF
+      ENDDO
+
+      !------------------------------------------------------------------
+      ! 2. Pre-compute Latitude weights (Units = 1/8 degree)
+      !------------------------------------------------------------------
+      CE(1) = 0
+      CE(2) = 4
+      DO J = 3, 181
+      CE(J) = CE(J-1) + 8
+      ENDDO
+      CE(182) = 1440
+
+      FE(1) = 0
+      FE(2) = 1
+      DO Y = 3, 721
+      FE(Y) = FE(Y-1) + 2
+      ENDDO
+      FE(722) = 1440
+
+      DO Y = 1, 721
+      B_edge = FE(Y)
+      T_edge = FE(Y+1)
+
+      yc1 = 1
+      DO J = 1, 181
+            IF ( B_edge >= CE(J) .AND. B_edge < CE(J+1) ) THEN
+            yc1 = J
+            EXIT
+            ENDIF
+      ENDDO
+
+      yc2 = 1
+      DO J = 1, 181
+            IF ( (T_edge-1) >= CE(J) .AND. (T_edge-1) < CE(J+1) ) THEN
+            yc2 = J
+            EXIT
+            ENDIF
+      ENDDO
+
+      IY1(Y) = yc1
+      IY2(Y) = yc2
+
+      IF ( yc1 == yc2 ) THEN
+            IF ( IS_CONC ) THEN
+            FRAC_Y1(Y) = 1.0d0
+            FRAC_Y2(Y) = 0.0d0
+            ELSE
+            FRAC_Y1(Y) = DBLE( T_edge - B_edge ) /
+     &                      DBLE( CE(yc1+1) - CE(yc1) )
+            FRAC_Y2(Y) = 0.0d0
+            ENDIF
+      ELSE
+            IF ( IS_CONC ) THEN
+            FRAC_Y1(Y) = DBLE( CE(yc2) - B_edge ) /
+     &                      DBLE( T_edge - B_edge )
+            FRAC_Y2(Y) = DBLE( T_edge - CE(yc2) ) /
+     &                      DBLE( T_edge - B_edge )
+            ELSE
+            FRAC_Y1(Y) = DBLE( CE(yc2) - B_edge ) /
+     &                      DBLE( CE(yc1+1) - CE(yc1) )
+            FRAC_Y2(Y) = DBLE( T_edge - CE(yc2) ) /
+     &                      DBLE( CE(yc2+1) - CE(yc2) )
+            ENDIF
+      ENDIF
+      ENDDO
+
+      !------------------------------------------------------------------
+      ! 3. Apply weights to regrid the data efficiently
+      !------------------------------------------------------------------
+!$OMP PARALLEL DO
+!$OMP+DEFAULT( SHARED )
+!$OMP+PRIVATE( L, Y, X, WX1, WX2, WY1, WY2, VAL )
+      DO L = 1, L1
+      DO Y = 1, 721
+            WY1 = FRAC_Y1(Y)
+            WY2 = FRAC_Y2(Y)
+
+            DO X = 1, 1152
+            WX1 = FRAC_X1(X)
+            WX2 = FRAC_X2(X)
+
+            ! Primary coarse box contribution
+            VAL = IN1x1( IX1(X), IY1(Y), L ) * WX1 * WY1
+
+            ! Crosses Longitude boundary
+            IF ( IX1(X) /= IX2(X) ) THEN
+                  VAL = VAL + IN1x1( IX2(X), IY1(Y), L ) * WX2 * WY1
+            ENDIF
+
+            ! Crosses Latitude boundary
+            IF ( IY1(Y) /= IY2(Y) ) THEN
+                  VAL = VAL + IN1x1( IX1(X), IY2(Y), L ) * WX1 * WY2
+            ENDIF
+
+            ! Crosses both boundaries (Corner case)
+            IF ( IX1(X)/=IX2(X) .AND. IY1(Y)/=IY2(Y) ) THEN
+                  VAL = VAL + IN1x1( IX2(X), IY2(Y), L ) * WX2 * WY2
+            ENDIF
+
+            GLOBAL_FINE(X, Y, L) = VAL
+            ENDDO
+      ENDDO
+      ENDDO
+!$OMP END PARALLEL DO
+
+      END SUBROUTINE REGRID_1x1_TO_025x03125
+
+!------------------------------------------------------------------------------      
       SUBROUTINE INIT_REGRID_1x1
 !
 !******************************************************************************

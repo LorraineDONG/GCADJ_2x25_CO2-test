@@ -370,8 +370,9 @@
       IF ( ITS_A_NEW_MONTH() ) THEN
 
          ! Fossil fuel emissions
-         ! print *,'dwh-CO2TEST:LANNFF'
-         LANNFF = .TRUE.
+         print *,'dwh-CO2TEST:LMONFF'
+         ! LANNFF = .TRUE.
+         LMONFF = .TRUE.
          IF ( LMONFF .OR. LANNFF .OR. LGENFF ) THEN
             CALL READ_FOSSILCO2
          ENDIF
@@ -1846,22 +1847,18 @@
       CALL READ_BPCH2( FILENAME, 'CO2-SRCE', 1,
      &                 TAU,       360,     180,
      &                 1,         ARRAY,     QUIET=.TRUE. )
-
       ! Cast to REAL*8 before regridding
       GEN_1x1(:,:,1) = ARRAY(:,:,1)
-
       ! Regrid from GENERIC 1x1 --> GEOS 1x1
       CALL DO_REGRID_G2G_1x1( 'kg/yr', GEN_1x1, GEOS_1x1 )
-
+      print*, '22222222--SHIP--222222222'
       ! Regrid from GEOS 1x1 --> current model resolution
       CALL DO_REGRID_1x1( 1, 'kg/yr', GEOS_1x1, GEOS_GRID)
-
       ! Convert units kg CO2 / yr --> molecules/cm2/s
       DO J = 1, JJPAR
       	EMSHIPCO2(:,J) = GEOS_GRID(:,J,1) * 6.022E23
      &            / ( 44.0d-3 * SEC_IN_YEAR * A_CM2(J))
       ENDDO
-
       !-----------------------------------------------------------------
       ! Global Ship Totals for the years 1985 to 2009
       !-----------------------------------------------------------------
@@ -1892,7 +1889,6 @@
       DO J = 1, JJPAR
          EMSHIPCO2(:,J) = EMSHIPCO2(:,J)*(GlobSTotNew(n)/GlobSTot)
       ENDDO
-
       END SUBROUTINE READ_SHIPCO2_EDGAR
 !EOC
 !------------------------------------------------------------------------------

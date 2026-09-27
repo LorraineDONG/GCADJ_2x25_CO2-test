@@ -651,6 +651,7 @@
 
       ! Regrid from GEOS 1x1 grid to current grid.  (The unit 'molec/cm2'
       ! is just used to denote that the quantity is per unit area.)
+      print*, '111111111--GFED--111111111'
       CALL DO_REGRID_1x1( N_SPEC,       'molec/cm2',
      &                    BIOM_GEOS_1x1, GFED2_BIOMASS )
 

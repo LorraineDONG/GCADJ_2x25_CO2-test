@@ -342,8 +342,10 @@ ifeq ($(SAT_NETCDF),yes)
 #====================
 # TES CODE
 #====================
-ml_co2en_ff_mod.o      : ml_co2en_ff_mod.f
+ml_co2en_ff_mod.o    : ml_co2en_ff_mod.f
 	$(F90) -c -r8 obs_operators/ml_co2en_ff_mod.f
+oco_xco2_obs_mod.o   : oco_xco2_obs_mod.f
+	$(F90) -c -r8 obs_operators/oco_xco2_obs_mod.f
 gosat_co2_mod.o      : gosat_co2_mod.f
 	$(F90) -c -r8 obs_operators/gosat_co2_mod.f
 tes_nh3_mod.o        : tes_nh3_mod.f

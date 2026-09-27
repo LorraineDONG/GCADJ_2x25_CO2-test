@@ -281,7 +281,8 @@
             ! fwd code:
             !STT(I,J,1,1)   = STT(I,J,1,1) + E_CO2
             ! adj code:
-            E_CO2_ADJ = STT_ADJ(I,J,1,1)
+            ! E_CO2_ADJ = STT_ADJ(I,J,1,1)
+            E_CO2_ADJ = STT_ADJ(I,J,1,1) + STT_ADJ(I,J,1,2)
 
             ! fwd code:
             !E_CO2          = E_CO2 * A_CM2 * DTSRCE / XNUMOL_CO2

@@ -1814,6 +1814,10 @@
       USE XCO2EN_OBS_MOD,       ONLY : CALC_XCO2EN_FORCE
 #endif
 
+#if defined(OCO_XCO2_OBS)
+      USE OCO_XCO2_OBS_MOD, ONLY : CALC_OCO_XCO2_FORCE
+#endif
+
 ! Add MOPITT v5 (zhej, dkh, 01/16/12, adj32_016)
 #if   defined( MOPITT_v5_CO_OBS ) || defined ( MOPITT_V6_CO_OBS )
       USE MOPITT_OBS_MOD,       ONLY : READ_MOPITT_FILE,
@@ -1882,6 +1886,7 @@
       REAL*8              :: CF_TESNH3
       REAL*8              :: CF_TESO3
       REAL*8              :: CF_GOSCO2
+      REAL*8              :: CF_OCOCO2
       REAL*8              :: CF_MODIS_AOD
       REAL*8              :: CF_OMI_SO2
       REAL*8              :: CF_TROPOMI_NO2
@@ -2160,6 +2165,18 @@
 
       ! Track cost function contributions
       CF_GOSCO2 = CF_GOSCO2 + COST_FUNC - CF_PRIOR
+
+#endif
+
+#if   defined ( OCO_XCO2_OBS )
+
+      ! Track cost function contributions
+      CF_PRIOR = COST_FUNC
+
+      CALL CALC_OCO_XCO2_FORCE( COST_FUNC )
+
+      ! Track cost function contributions
+      CF_OCOCO2 = CF_OCOCO2 + COST_FUNC - CF_PRIOR
 
 #endif
 

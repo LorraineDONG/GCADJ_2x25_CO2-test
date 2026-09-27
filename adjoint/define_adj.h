@@ -35,7 +35,8 @@
 !  (23) MOPITT_V6_CO_OBS    : Use v6 CO obs form MOPITT
 !  (24) TES_O3_IRK          : Use radiative kernels for TES O3
 !  (25) OMI_SO2_OBS         : Use OMI L3 SO2
-!  (26) ML_CO2EN_OBS        : Use meachine learning xCO2en from OCO2/3
+!  (26) ML_CO2EN_OBS        : Use meachine learning xCO2en from XGBOOST
+!  (27) OCO_XCO2_OBS        : Use meachine learning XCO2 from OCO2/3
 !
 ! NOTES:
 ! (1 )  Replace MOPITT_IR_CO_OBS with MOPITT_V3_CO_OBS and MOPITT_V4_CO_OBS
@@ -65,6 +66,7 @@
 #undef AIRS_CO_OBS
 #undef GOSAT_CO2_OBS
 #undef ML_CO2EN_OBS
+#undef OCO_XCO2_OBS
 #undef PM_ATTAINMENT
 #undef SOMO35_ATTAINMNET
 #undef PSEUDO_OBS
@@ -161,6 +163,10 @@
 !-------XCO2_EN observations------------
 ! => ML_CO2EN_OBS
 #define ML_CO2EN_OBS
+
+!-------XCO2 OCO-2/3 observations------------
+! => OCO_XCO2_OBS
+!#define OCO_XCO2_OBS
 
 !-------SO2 observations------------
 ! => OMI_SO2_OBS

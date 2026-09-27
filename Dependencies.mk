@@ -485,6 +485,12 @@ ml_co2en_ff_mod.o        : ml_co2en_ff_mod.f
 	$(F90) -c -r8 $<
 
 #====================
+# OCO-2/3 XCO2
+#====================
+oco_xco2_obs_mod.o        : oco_xco2_obs_mod.f
+	$(F90) -c -r8 $<
+
+#====================
 # GOSAT CO2
 #====================
 gosat_co2_mod.o        : gosat_co2_mod.f
